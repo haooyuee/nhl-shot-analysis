@@ -1,0 +1,33 @@
+# docker-compose.yml
+version: '3'
+
+services:
+  serving:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.serving
+#      args:
+#        ARG: <ARG>
+    image: ift6758/serving:1.0.2
+    ports:
+      - "4000:4000"
+    environment:
+      - COMET_API_KEY = C9fFlfJAjVN4p2ruXHHpMYUzz
+#      - <SERVING_PORT>:<SERVING_PORT>
+#    environment:
+#      DOCKER_ENV_VAR = ${LOCAL_ENV_VAR}
+###### Uncomment below when you're ready to add the final notebook container to your docker compose
+  streamlit:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile.streamlit
+##      args:
+##        ARG: <ARG>
+    image: ift6758/streamlit:1.0.2
+    ports:
+      - 8080:8080
+    environment:
+      - COMET_API_KEY = C9fFlfJAjVN4p2ruXHHpMYUzz
+      
+
+     
