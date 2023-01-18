@@ -1,6 +1,8 @@
 # nhl-shot-analysis-app
 
 - The project is divided into three milestones, and the work includes: data collection, feature engineering, model training and simple app.
+- team member : Subhrajyoti Dasgupta; Yi Cong Li; Myyank Shukla; Haoyue Sheng
+	
 
 ---
 layout: post
