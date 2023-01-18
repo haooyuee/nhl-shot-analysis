@@ -594,3 +594,597 @@ Buffalo Sabres tends to shoot more on both left and right side position, but les
 Tampa Bay, quite the opposite, tends to shoot mostly in the middle position, but less on sides.
   
   
+
+## Question 2 Feature Engineering I
+
+### 2.1
+
+![image](blogpost/src/assets/images/M2_Q2_1.png)
+![image](blogpost/src/assets/images/M2_Q2_2.png)
+<div style="text-align: center"><i>Histograms of shot counts for distance to the net(goals and no-goals)</i></div><br>
+
+We have displayed two histograms of the shot count with goals and no goals from the dataset( 2015/16 - 2018/19 regular season data) which present their distance to the net.<br>
+We can see that when the distance exceeds 60ft, the number of shots on the goal drops rapidly, and the further away, the less the number of counts to score. In addition, it is very rare to shoot at the opponent's goal in the own half-rink, let alone get a goal.<br>
+This might be because the longer the distance of the shot, the smaller the goal for the Shooter and the longer the reaction time for the Goaltender.<br>
+
+
+
+
+
+![image](blogpost/src/assets/images/M2_Q2_3.png)
+![image](blogpost/src/assets/images/M2_Q2_4.png)
+<div style="text-align: center"><i>Histograms of shots for angle to the net (goals and no-goals)</i></div><br>
+
+
+We have displayed two histograms of the shot count with goals and no goals from the dataset( 2015/16 - 2018/19 regular season data) which present their angle to the net.<br>
+Interestingly, we can see that the shooters often seem to be shooting straight to the net or shooting at an angle of around +/-30 degrees. However, for goals taken the most often scored is shooting straight to the net. And after the angle is greater than +/-30 degrees, the number of scoring starts to decrease.<br>
+
+
+
+
+![image](blogpost/src/assets/images/M2_Q2_5.png)
+<div style="text-align: center"><i> 2D scatter plot and histograms of shot counts for distance and angle</i></div><br>
+
+From the 2D histogram, we can see the closer to the goal, the more likely the shooter is to attempt a wide-angle shot. When farther from the net, the shooter tends to shoot from a little angle.<br> 
+We also noticed that the areas with the most frequent shooting attempts were: the area near the goal, areas around 60 feet away from the net, and +/-30 degrees.
+
+
+### 2.2
+![image](blogpost/src/assets/images/M2_Q2_6.png)
+![image](blogpost/src/assets/images/M2_Q2_7.png)
+<div style="text-align: center"><i>goal rate for shot distance and goal rate for shot angle</i></div><br>
+
+
+We have displayed two Line charts of the goals rate which present their distance and angle to the net.<br>
+We can draw similar conclusions as before from the two plots: The closer shooters get to the net and the smaller the angle, the more likely to score a goal.<br>
+It can be noticed that the goals rate fluctuates and increases when far away from the net. This is probably due to the players being more willing to shoot from long distances only when the net is empty, so the goal rate increases at this time.
+
+
+### 2.3
+
+![image](blogpost/src/assets/images/M2_Q2_8.png)
+![image](blogpost/src/assets/images/M2_Q2_9.png)
+
+
+The two histograms show the proportion of empty and non-empty nets scores. The obvious difference that can be observed is the distance between empty net goals and non-empty net goals. Most goals scored on a non-empty ball are relatively close to the net. However, when the net is empty, shooters have more chances to get scores when shot from almost anywhere on the court.<br>
+After using our “domain knowledge” for some quick sanity checks, We found a very suspicious goal:
+
+
+| Name Info         | Info              |
+| -----------       | -----------       |
+| gameID:           | 2016020510        |
+| eventID :         | 297               |
+| period :          | 2                 |
+| home:             | Florida Panthers  |
+| away:             | Detroit Red Wings |
+| shooter:          | Derek MacKenzie   |
+| Shot coordinates: | -97, 21           |
+| distanceNet:      | 187.2             |
+| angleNet:         | 6.4               |
+
+
+![image](blogpost/src/assets/images/M2_Q2_eventsanormal.png)
+
+
+We noticed that this shot was very far from the Net.<br>
+According to the 2 minutes 37 seconds of the game video on youtube, we can confirm that this is the wrong coordinate data. It wasn't a long shot, it was a One timer shot after a pass.<br>
+The goal can be seen [here](https://www.youtube.com/watch?v=We-JH8xWf1M&t=192s) at the 2:35 timestamp
+
+
+
+
+## Question 3 Baseline Models
+
+### 3.1
+
+![image](blogpost/src/assets/images/M2_Q3_01.png)
+<div style="text-align: center"><i>Heatmap of predictions on the validation set from the logistic regression  distance feature</i></div><br>
+
+
+We evaluate the accuracy on the validation set using a heatmap, which shows that the model predicts that all shots are missed. However, the accuracy of the model is over 90%, because in the validation set, the number of shots on goal is much smaller than the number of missed shots. (1:10) At this point, the accuracy of the results is not a good indicator, we should consider recall and precision.<br> 
+
+
+### 3.2 and 3.3
+
+![image](blogpost/src/assets/images/M2_Q3_1.png)
+<div style="text-align: center"><i>ROCcurves of the logistic regression model from different features and random baseline</i></div><br>
+
+
+ROC curves typically feature true positive rate on the Y axis, and false positive rate on the X axis. This means that the top left corner of the plot is the “ideal” point - a false positive rate of zero, and a true positive rate of one. This is not very realistic, but it does mean that a larger area under the curve (AUC) is usually better.<br>
+We have displayed ROC curves for four different models: logistic regression for distance, logistic regression for angle, logistic regression for distance and angle, Random baseline. In our case, the discriminative performance of the feature of distance is greater than that of the angle feature, and the best results can be obtained by using both features.<br>
+
+
+![image](blogpost/src/assets/images/M2_Q3_2.png)
+<div style="text-align: center"><i>Goal rate curves of the logistic regression model from different features and random baseline</i></div><br>
+
+
+The goal rate plot shows a trend: in each bin, when the model predicts a higher probability of a goal, the higher the probability of a goal being scored in reality too. We can obtain similar results as before from the plot: the discriminative performance of the feature of distance is greater than that of the angle feature, and the best results can be obtained by using both features.<br>
+
+
+![image](blogpost/src/assets/images/M2_Q3_3.png)
+<div style="text-align: center"><i>Cumulative proportion of goals curves of the logistic regression model from different features and random baseline</i></div><br>
+
+
+We can still observe similar results, the discriminative performance of angular features is lower than that of distance features, and the combination of the two achieves the highest discrimination.
+<br>
+
+![image](blogpost/src/assets/images/M2_Q3_4.png)
+<div style="text-align: center"><i>Calibration curves of the logistic regression model from different features and random baseline</i></div><br>
+
+
+Calibration curves (also known as reliability diagrams) compare how well the probabilistic predictions of a binary classifier are calibrated. It plots the true frequency of the positive label against its predicted probability, for binned predictions.<br>
+From the obtained Calibration curves, we can see that all the models do not have high reliability due to the unbalanced amount of data. When the angle feature is used alone, its reliability is low, but relatively high reliability can be obtained when the angle and distance features are used together. Similarly, we can also confirm the correlation between the distance feature and the score.<br>
+
+In general, it can be determined that the distance feature itself is very important to the performance of the model. When it is combined with angular features, the model performs slightly better. However, the angle feature itself is not very discriminative and follows the trend of random baselines.<br>
+
+
+### 3.4
+
+Links to the three experiment entries in the comet.ml projects that produced these three models.
+
+[logreg for distance](https://www.comet.com/ift6758-22-team2/nhl-analytics/666e5521020146f2b85f9ca2f4d087fb) for the model with distance,
+
+[logreg for angle](https://www.comet.com/ift6758-22-team2/nhl-analytics/4710a54204864cc8bed006e130c8872b) for the model with angle,
+
+[logreg for distance and angle](https://www.comet.com/ift6758-22-team2/nhl-analytics 3c10fb4d2e74414b842f4620500115bd) for the model with both distance and angle.
+
+
+
+
+## Question 4.5 Feature Engineering
+
+<b> List of Added Features</b><br>
+
+<ol>
+  <li> <b>game_seconds :</b> time passed in seconds since start of game.
+  </li>
+  <li> <b>game_period :</b> current period of game.
+  </li>
+  <li> <b>x :</b> x coordinate of the shot.
+  </li>
+  <li> <b>y :</b> y coordinate of the shot.
+  </li>
+  <li> <b>distanceNet_or_shotDistance :</b> distance between the net and the xy coordinates of the shot.
+  </li>
+  <li> <b>angleNet_or_shotAngleWithSign :</b> angle between the middle line (on y-axis) and the line connecting xy coordinates of the shot and net.
+  </li>
+  <li> <b>shot_angle_absolute :</b> absolute value of shot angle.
+  </li>
+  <li> <b>shotType :</b> type of shot.
+  </li>
+  <li> <b>last_event :</b> type of last event.
+  </li>
+  <li> <b>last_x :</b> x coordinate of last event.
+  </li>
+  <li> <b>last_y :</b> y coordinate of last event.
+  </li>
+  <li> <b>time_from_last_event :</b> time passed in seconds since the last event.
+  </li>
+  <li> <b>distance_from_last_event :</b> distance between xy coordinates of last event and current event.
+  </li>
+  <li> <b>rebound :</b> indicates whether this shot is a rebound shot. True if the last event was also a shot, otherwise False.
+  </li>
+  <li> <b>change_in_shot_angle :</b> The angle between the line passing through last shot position and net, and the line passing through current rebound shot position and net.
+  </li>
+  <li> <b>speed :</b>  the distance from the previous event divided by the time since the previous event.
+  </li>
+  <li> <b>time_since_powerplay_started :</b>  time passed (in seconds) since the start of power-play, reset to 0 when power-play ends.
+  </li>
+  <li> <b>nbFriendly_non_goalie_skaters :</b>  number of friendly skaters of the shooting team on the ice
+  </li>
+  <li> <b>nbOpposing_non_goalie_skaters :</b>  number of opposing skaters of the shooting team on the ice
+  </li>
+  <li> <b>team_side :</b>  the side of rink of the shooting team
+  </li>
+  
+</ol>
+
+<b>Comet.ml link storing to the experiment which stores the filtered DataFrame artifact for game 'wpg_v_wsh_2017021065':</b><br>
+
+<a href="https://www.comet.com/ift6758-22-team2/nhl-analytics/acf3478af3d1474eb6fdbab970370d9c"> https://www.comet.com/ift6758-22-team2/nhl-analytics/acf3478af3d1474eb6fdbab970370d9c </a>
+
+## Question 5. Advanced Models
+### 5.1 XGBoost using only `distance` and `angle` features
+#### Experiment on comet.ml: <a href="https://www.comet.com/ift6758-22-team2/nhl-analytics/9d331e535f2249598410afcac3517d08?experiment-tab=chart" target="_blank">XGBoost with Distance and angle</a><br>
+
+<b>a. Preprocessing and Train/val split - </b>We take the game data from the 2015/16 to 2018/19 regular season. Before splitting the data, we do some preprocessing. Firstly, we correct the datatypes of `'x', 'y', 'last_x', 'last_y', 'distance_from_last_event', 'speed', 'sum_x', 'distanceNet'` to float type to maintain the consistency. We also replace NAN or missing values by the feature-mean for numerical features and apply “most frequent” strategy for non-numerical features. Finally, we apply one-hot encoding to categorical features like `'shotType', 'last_event'` etc.  We then divide the entire data into train-val splits in 75% and 25% ratios respectively.
+
+<b>b. Performance - </b>Compared to the Logistic Regression model, the ROC AUC score improves slightly from `0.71` to `0.72` which we believe is because of the inherent capacity of the model. However, it is not a good performance for real-life use.  We therefore proceed to choose better features.
+
+Here are some plots to demonstrate the performance of the model:
+<center><img src="blogpost/src/assets/images/q5.1ROC Curve using Distance and Angle.svg"></center>
+<center><img src="blogpost/src/assets/images/q5.1Goal Rate using Distance and Angle.svg"></center>
+<center><img src="blogpost/src/assets/images/q5.1Cumulative goal using Distance and Angle.svg"></center>
+<center><img src="blogpost/src/assets/images/q5.1Calibration curve using Distance and Angle.svg"></center>
+
+### 5.2 XGBoost using all features + cross-validation
+#### Experiment on comet.ml: <a href="https://www.comet.com/ift6758-22-team2/nhl-analytics/4dbbaa9347834df9872defc89fb3e7cc?experiment-tab=chart" target="_blank">XGBoost with all features</a><br><br>
+
+We first manually test with 2 hyperparameters namely `eta` or `learning_rate` and `booster`. The results of the manual tuning is shown below:
+<center><img src="blogpost/src/assets/images/q5.2_ROC Curve with varying learning rate.svg"></center>
+<center><img src="blogpost/src/assets/images/q5.2_ROC Curves with varying booster.svg"></center>
+
+Subsequently, we use the Grid Search technique for hyperparameter tuning. We use the following hyperparameters for tuning: 
+- `eta` or `learning_rate`
+- booster
+- subsample
+- max_depth
+We use the `roc_auc` scoring criteria for the grid search. The best performance obtained for:
+
+| Hyperparam        | Value             |
+| -----------       | -----------       |
+| eta               | 0.1               |
+| booster           | "gbtree"          |
+| max_depth         | 7                 |
+| subsample         | 0.8               |
+
+
+We find that the performance improves greatly compared to the XGBoost baseline model(trained with only distance and angle). There is around 3% increase in accuracy and the ROC AUC score has jumped from 0.50 to 0.63 showing an improvement. However, the most noticeable improvement is in the f-score metric which has improved from 0.006 to 0.42 which suggests the robustness of the model. Below are the performance measure of the best model using cross-validation:
+<center><img src="blogpost/src/assets/images/q5.2_2_ROC Curve (all features + cross-val).svg"></center>
+<center><img src="blogpost/src/assets/images/q5.2_2_Goal rate (all features + cross-val).svg"></center>
+<center><img src="blogpost/src/assets/images/q5.2_2_Cumulative goal (all features + cross-val).svg"></center>
+<center><img src="blogpost/src/assets/images/q5.2_2_Calibration Curve (all features + cross-val).svg"></center>
+
+### 5.3 XGBoost with feature selection + cross-validation
+#### Experiment on comet.ml: <a href="https://www.comet.com/ift6758-22-team2/nhl-analytics/5a0f6b7429074bd6adf056f184519c30?experiment-tab=chart" target="_blank">XGBoost with feature selection</a><br><br>
+
+We use SHAP to interpret the dependency of the model on different features. Here’s a representation of the same:
+<center><img src="blogpost/src/assets/images/q5.3_SHAP Features.svg"></center>
+
+Following this, we also explore 3 different feature selection strategies:
+- Variance Threshold
+- f_classif
+- L1-based feature selection
+
+Here’s the ROC curve after feature selection using the above algorithms:
+<center><img src="assets/images/q5.3_ROC Curve for different feature selection.svg"></center>
+
+We find the L1-based feature selection yields the highest ROC AUC score. We find that a similar performance is obtained using only 16 features instead of all features. The selected features are:
+`'change_in_shot_angle' 'distanceNet_or_shotDistance' 'distance_from_last_event' 'game_period' 'game_seconds' 'last_event'  'last_x' 'nbFriendly_non_goalie_skaters' 'nbOpposing_non_goalie_skaters' 'rebound' 'shotType' 'shot_angle_absolute' 'speed' 'time_from_last_event' 'time_since_powerplay_started' 'y'`
+
+
+Here’s the confusion matrix of the best XGBoost model:
+<center><img src="blogpost/src/assets/images/q5.3_Confusion matrix of Best XGBoost model.svg"></center>
+
+
+Below we represent the comparisons of the various variants of the XGBoost models we have experimented with:
+
+<b>[NOTE: The curve for "all features" and "feature selection" may be overlapping in the following graphs. This, although indicates similar performance between the two approaches, the "feature selection" approach uses lesser features.]</b>
+<center><img src="blogpost/src/assets/images/q5.3_ROC Curve.svg"></center>
+<center><img src="blogpost/src/assets/images/q5.3_Goal rate.svg"></center>
+<center><img src="blogpost/src/assets/images/q5.3_Cumulative goal Best XGBoost model.svg"></center>
+<center><img src="blogpost/src/assets/images/q5.3_Calibration curve - Best XGBoost model.svg"></center>
+
+
+## Question 6. Give it your best shot!
+<br>
+<b>6 a). discuss the various techniques and methods you tried. Include the same four figures as in Part 3 (ROC/AUC curve, goal rate vs probability percentile, cumulative proportion of goals vs probability percentile, and the reliability curve).</b>
+
+<b>Training Data</b> - Data from year 2015/16 - 2018/19.<br><br>
+<b>Experiment No. 1</b><br>
+Experiment Entry : <a href="https://www.comet.com/ift6758-22-team2/nhl-analytics/7903f1d820df4c249c73b0f90a9b5118?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=wall">Q6_Best_Shot_MLP_Classifier</a><br><br>
+<b>Data pre-processing</b>
+
+<ol>
+  <li> <b>Categorical transform :</b><br>
+ <ul>
+ <li>Simple imputer: used to remove categorical missing data related to one or more features with appropriate values. Strategy used = most_frequent, which replaces missing using the most frequent value along each column. 
+ </li>
+ <li>Encoding: Converting categorical information into ordinal numbers (0, 1, 2, 3, etc). So that model can interpret data more easily.
+ </li>
+ </ul>
+  </li>
+  <li> <b>Numerical transform :</b> 
+  <ul>
+ <li>Simple imputer: used to remove Numerical missing data related to one or more features with appropriate values. Strategy used = mean, which replace missing values using the mean along each column
+ </li>
+ <li>Standard Scaling: It removes the mean and scales each feature/variable to unit variance.
+ </li>
+ </ul>
+  </li>
+</ol>
+<b>Feature Selection</b><br><br>
+Using SelectFromModel Meta-transformer for selecting features based on importance weights with Linear Support Vector Machine as the estimator for feature selection.
+<br><br>
+<b>Classifier</b><br><br>
+Model – MLP classifier (Multi-layer Perceptron classifier)
+The multilayer perceptron (MLP) is a feedforward artificial neural network model that maps input data sets to a set of appropriate outputs. An MLP consists of multiple layers and each layer is fully connected to the following one. 
+<br>
+<center><img src="blogpost/src/assets/images/Q6_mlpclassifier.png"></center>
+<br>
+<b>Model Pipeline</b><br>
+<center><img src="blogpost/src/assets/images/Q6_mlpclassifier_pipe.png"></center>
+<br>
+<b>Cross-validation technique</b><br><br>
+Cross-validation is a resampling method that uses different portions of the data to test and train a model on different iterations
+StratifiedKFold Method: This cross-validation object is a variation of KFold that returns stratified folds. The folds are made by preserving the percentage of samples for each class.
+<br>
+
+<b>Hyperparameter tunning Method</b><br><br>
+RandomizedSearchCV: The RandomizedSearchCV class allows for stochastic search. stochastic search will sample hyperparameter 1 independently from hyperparameter 2 and find the optimal region for best fit.
+Testing model for following hyperparameters:
+<br>
+<center><img src="blogpost/src/assets/images/Q6_mlpclassifier_hyperp.png"></center>
+<br>
+<b>best estimator:</b>
+<center><img src="blogpost/src/assets/images/Q6_mlpclassifier_best_pipe.png"></center>
+<br>
+<b>Quantity Metric</b>
+<center><img src="blogpost/src/assets/images/Q6_mlpclassifier_metric.png"></center>
+
+
+<b>Experiment No. 2</b><br><br>
+Experiment Entry : <a href="https://www.comet.com/ift6758-22-team2/nhl-analytics/5b1d30373735438ebbbf58c52427e9d7?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=wall">Q6_Best_Shot_Random_forest</a><br>
+<b>Data pre-processing</b>
+<ol>
+  <li> <b>Categorical transform :</b><br>
+ <ul>
+ <li>Simple imputer: used to remove categorical missing data related to one or more features with appropriate values. Strategy used = most_frequent, which replaces missing using the most frequent value along each column. 
+ </li>
+ <li>Encoding: Converting categorical information into ordinal numbers (0, 1, 2, 3, etc). So that model can interpret data more easily.
+ </li>
+ </ul>
+  </li>
+  <li> <b>Numerical transform :</b> 
+  <ul>
+ <li>Simple imputer: used to remove Numerical missing data related to one or more features with appropriate values. Strategy used = mean, which replace missing values using the mean along each column
+ </li>
+ <li>Standard Scaling: It removes the mean and scales each feature/variable to unit variance.
+ </li>
+ </ul>
+  </li>
+</ol>
+<b>Feature Selection</b><br><br>
+Using RFECV(Recursive Feature Elimination, Cross-Validated) method for selecting features with Linear Regression model as estimator
+<br><br>
+<b>Classifier</b><br><br>
+Model – RandomForestClassifier
+A random forest is a meta estimator that fits a number of decision tree classifiers on various sub-samples of the dataset and uses averaging to improve the predictive accuracy and control over-fitting 
+<br>
+<center><img src="blogpost/src/assets/images/Q6_rf_classifier.png"></center>
+<br>
+<b>Model Pipeline</b><br>
+<center><img src="blogpost/src/assets/images/Q6_rf_pipe.png"></center>
+<br>
+<b>Cross-validation technique</b><br><br>
+KFold Method: Provides train/test indices to split data in train/test sets. Split dataset into k consecutive folds. Each fold is then used once as a validation while the k - 1 remaining folds form the training set.
+<br>
+
+<b>Hyperparameter tunning Method</b><br><br>
+RandomizedSearchCV: The RandomizedSearchCV class allows for stochastic search. stochastic search will sample hyperparameter 1 independently from hyperparameter 2 and find the optimal region for best fit.
+Testing model for following hyperparameters:
+<br>
+<center><img src="blogpost/src/assets/images/Q6_rf_hyperparam.png"></center>
+<br>
+<b>best estimator:</b>
+<center><img src="blogpost/src/assets/images/Q6_rf_bestimate.png"></center>
+<br>
+<b>Quantity Metric</b>
+<center><img src="blogpost/src/assets/images/Q6_rf_metric.png"></center>
+
+
+<b>Experiment No. 3</b><br><br>
+Experiment Entry : <a href="https://www.comet.com/ift6758-22-team2/nhl-analytics/924942559dc14af995c8755259a7afd4?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=wall">Q6_Best_Shot_Knn</a><br>
+<b>Data pre-processing</b>
+
+<ol>
+  <li> <b>Categorical transform :</b><br>
+ <ul>
+ <li>Simple imputer: used to remove categorical missing data related to one or more features with appropriate values. Strategy used = most_frequent, which replaces missing using the most frequent value along each column. 
+ </li>
+ <li>Encoding: Using One hot encoding method which encodes categorical features as a one-hot numeric array.
+ </li>
+ </ul>
+  </li>
+  <li> <b>Numerical transform :</b> 
+  <ul>
+ <li>Simple imputer: used to remove Numerical missing data related to one or more features with appropriate values. Strategy used = mean, which replace missing values using the mean along each column
+ </li>
+ <li>Standard Scaling: It removes the mean and scales each feature/variable to unit variance.
+ </li>
+ </ul>
+  </li>
+</ol>
+<b>Feature Selection</b><br><br>
+Using RFE(Recursive feature elimination) method for selecting features with Decision tree classifier as estimator.
+<br><br>
+<b>Classifier</b><br><br>
+Model – k-nearest neighbors
+The k-nearest neighbors algorithm, also known as KNN or k-NN, is a non-parametric, supervised learning classifier, which uses proximity to make classifications or predictions about the grouping of an individual data point.
+<br>
+<center><img src="blogpost/src/assets/images/Q6_knnclassifier.png"></center>
+<br>
+<b>Model Pipeline</b><br>
+<center><img src="blogpost/src/assets/images/Q6_knn_pipe.png"></center>
+<br>
+<b>Cross-validation technique</b><br><br>
+RepeatedKFold Method: Repeated K-Fold cross validator.Repeats K-Fold n times with different randomization in each repetition
+<br>
+
+<b>Hyperparameter tunning Method</b><br><br>
+GridSearchCV: GridSearchCV is a technique for finding the optimal parameter values from a given set of parameters in a grid
+Testing model for following hyperparameters:
+<br>
+<center><img src="blogpost/src/assets/images/Q6_knn_hyper.png"></center>
+<br>
+<b>best estimator:</b>
+<center><img src="blogpost/src/assets/images/Q6_knn_bestest.png"></center>
+<br>
+<b>Quantity Metric</b>
+<center><img src="blogpost/src/assets/images/Q6_knn_metric.png"></center>
+<br>
+<b>Comparing all Experiments to find best ‘final’ model</b><br><br>
+Experiment Entry : <a href="https://www.comet.com/ift6758-22-team2/nhl-analytics/ca369bf926c34d959337975ef7fd027e?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step"> Q6_bestshot_ModelCompare </a>
+<center><img src="blogpost/src/assets/images/Q6_compare.png"></center>
+<b>Fitting model on train dataset to find best accuracy model</b>
+<center><img src="blogpost/src/assets/images/Q6_modelfit.png"></center>
+<br>
+<center><img src="blogpost/src/assets/images/Q6_compare_best_acc.png"></center>
+<br>
+MLP Classifier gives the best accuracy on validation set<br><br>
+<b>Combined Model performance Visualization</b>
+<br><br>
+Precision-Recall Curve
+<center><img src="blogpost/src/assets/images/Q6_compare_prcurve.png">
+Entry :<a href="https://www.comet.com/api/image/download?imageId=8de0c56c46e543f580ce89adfcd80417&experimentKey=ca369bf926c34d959337975ef7fd027e">Precision-Recall Curve</a></center>
+<br>
+
+ROC Curve
+<center><img src="blogpost/src/assets/images/Q6_compare_roc.png">
+Entry :<a href="https://www.comet.com/api/image/download?imageId=f7e6759448e9429e95a69aaec2f414e8&experimentKey=206aeb1f89fb4ceca57b7000cf679611">ROC Curve</a></center>
+<br>
+Goal rate vs probability percentile
+<center><img src="blogpost/src/assets/images/Q6_compare_goalrate.png">
+Entry :<a href="https://www.comet.com/api/image/download?imageId=992449d3b0dd48aa8bdc89d8d1161fb3&experimentKey=ca369bf926c34d959337975ef7fd027e">Goal Rate</a></center>
+<br>
+Cumulative proportion of goals vs probability percentile
+<center><img src="blogpost/src/assets/images/Q6_compare_cumm.png">
+Entry : <a href="https://www.comet.com/api/image/download?imageId=d1efbc387b4f4143a4d93d138fcdc8bb&experimentKey=ca369bf926c34d959337975ef7fd027e">Cumulative % of goals</a></center>
+<br>
+Reliability curve
+<center><img src="blogpost/src/assets/images/Q6_compare_calibration.png">
+Entry : <a href="https://www.comet.com/api/image/download?imageId=3ce38af970094181bef69d3cc9763b91&experimentKey=ca369bf926c34d959337975ef7fd027e">Calibration plot</a></center>
+<br>
+precision-recall curve is used for evaluating the performance of binary classification algorithms with classes which are 
+heavily imbalanced, like the case in our dataset where amount of no_goal is larger than goal.A high area under the curve represents both high recall and high precision, where high precision relates to a low false positive rate, and high recall relates to a low false negative rate.High scores for both show that the classifier is returning accurate results (high precision), as well as returning a majority of all positive results (high recall).
+Hence, as MLP classifier has the highest area under the graph it is the better classfier.
+Similary AUC(area under Roc Curve) provides an aggregate measure of performance across all possible classification thresholds.
+As MLP has the highest area under the roc curve it performs better.
+<br>
+From performance Visualization plots and accuracy on validation set it can be concluded that <b>MLP classifier</b>
+performs better than other models. Hence, it is the best shot model in all classifiers.
+
+<br>
+## Question 7. Evaluate on test set
+<br>
+Experiment Entry : <a href="https://www.comet.com/ift6758-22-team2/nhl-analytics/1f7eaab900a340f6ad0521f1259b5929?experiment-tab=chart&showOutliers=true&smoothing=0&transformY=smoothing&xAxis=step">Q7_Evaluate_on_test_set</a><br>
+<br>
+<b>7.a) Test on 2019/20 regular season dataset</b><br>
+<br>
+<center><img src="blogpost/src/assets/images/Q7_model_download.png"></center>
+<br>
+<b>Model Evaluation performance Visualization</b><br><br>
+Precision-Recall Curve
+<center><img src="blogpost/src/assets/images/Q7_pr_curve.png">
+Entry :<a href="https://www.comet.com/api/image/download?imageId=b323ad4c66614085b35b7da4671bd0ef&experimentKey=1f7eaab900a340f6ad0521f1259b5929">Precision-Recall Curve</a></center>
+<br>
+ROC Curve
+<center><img src="blogpost/src/assets/images/Q7_roc_curve.png">
+Entry :<a href="https://www.comet.com/api/image/download?imageId=f56e37f63ec049af998b6efa2119ffe3&experimentKey=1f7eaab900a340f6ad0521f1259b5929">ROC Curve</a></center>
+<br>
+Goal rate vs probability percentile
+<center><img src="blogpost/src/assets/images/Q7_goal_rate.png">
+Entry :<a href="https://www.comet.com/api/image/download?imageId=fcc45ceaea2c4519a051661aedc1346c&experimentKey=1f7eaab900a340f6ad0521f1259b5929">Goal Rate</a></center>
+<br>
+Cumulative proportion of goals vs probability percentile
+<center><img src="blogpost/src/assets/images/Q7_cum_goal.png">
+Entry : <a href="https://www.comet.com/api/image/download?imageId=65b30c667a7244d29557729c468f15ac&experimentKey=1f7eaab900a340f6ad0521f1259b5929">Cumulative % of goals</a></center>
+<br>
+Reliability curve
+<center><img src="blogpost/src/assets/images/Q7_calibration_plot.png">
+Entry : <a href="https://www.comet.com/api/image/download?imageId=947f41fd10304aae94bd5dcde8ab5e84&experimentKey=1f7eaab900a340f6ad0521f1259b5929">Calibration plot</a></center>
+<br>
+Best Classifier on 2019-2020 Regular Season
+<br>
+
+<table>
+  <tr>
+    <th>Model</th>
+    <th>Accuracy</th>
+  </tr>
+    <tr>
+    <td>XGB</td>
+    <td>0.928702</td>
+  </tr>
+  <tr>
+    <td>MLP</td>
+    <td>0.905500 </td>
+  </tr>
+    <tr>
+    <td>Logistic Regression(distance)</td>
+    <td>0.903028</td>
+  </tr>
+    <tr>
+    <td>Logistic Regression(angle)</td>
+    <td>0.903028</td>
+  </tr>
+    <tr>
+    <td>Logistic Regression(distance+angle)</td>
+    <td>0.903028</td>
+  </tr>
+</table>
+<br>
+It can be observed that model accuracy for all classifier reduced when 
+evaluated for test set. The percentage decrease in performance for mlp
+was the greatest among other models. Overall the models gave satisfactory results
+similar to those on validation set. XGboost performed the best among all classifiers with 
+accuracy of 0.928.
+
+
+<br>
+<center><img src="blogpost/src/assets/images/Q7_best_model_r.png"></center>
+<br><br>
+<b>7.B) Test on 2019/20 Playoff season dataset</b><br>
+<br>
+
+<b>Model Evaluation performance Visualization</b><br><br>
+Precision-Recall Curve
+<center><img src="blogpost/src/assets/images/Q7_pr_curve_plf.png">
+Entry :<a href="https://www.comet.com/api/image/download?imageId=6b49eadc9d4143469a9d6f991dd5f1fa&experimentKey=1f7eaab900a340f6ad0521f1259b5929">Precision-Recall Curve</a></center>
+<br>
+ROC Curve
+<center><img src="blogpost/src/assets/images/Q7_roc_curve_plf.png">
+Entry :<a href="https://www.comet.com/api/image/download?imageId=42658cfe5897489790476968aaaa4d32&experimentKey=1f7eaab900a340f6ad0521f1259b5929">ROC Curve</a></center>
+<br>
+Goal rate vs probability percentile
+<center><img src="blogpost/src/assets/images/Q7_goal_rate_plf.png">
+Entry :<a href="https://www.comet.com/api/image/download?imageId=7f1615abf69849d9ba1036c726eabc7b&experimentKey=1f7eaab900a340f6ad0521f1259b5929">Goal Rate</a></center>
+<br>
+Cumulative proportion of goals vs probability percentile
+<center><img src="blogpost/src/assets/images/Q7_cum_goal_plf.png">
+Entry : <a href="https://www.comet.com/api/image/download?imageId=0226ded34e9845d880cbaaafbcef82bb&experimentKey=1f7eaab900a340f6ad0521f1259b5929">Cumulative % of goals</a></center>
+<br>
+Reliability curve
+<center><img src="blogpost/src/assets/images/Q7_calibration_plot_plf.png">
+Entry : <a href="https://www.comet.com/api/image/download?imageId=915667b6a64a4d46acbbf5466bc436e3&experimentKey=1f7eaab900a340f6ad0521f1259b5929">Calibration plot</a></center>
+<br><br>
+Best Classifier on 2019-2020 Playoff Season
+<br>
+<table>
+  <tr>
+    <th>Model</th>
+    <th>Accuracy</th>
+  </tr>
+    <tr>
+    <td>XGB</td>
+    <td>0.928702</td>
+  </tr>
+  <tr>
+    <td>MLP</td>
+    <td>0.913954</td>
+  </tr>
+    <tr>
+    <td>Logistic Regression(distance)</td>
+    <td>0.912333</td>
+  </tr>
+    <tr>
+    <td>Logistic Regression(angle)</td>
+    <td>0.912333</td>
+  </tr>
+    <tr>
+    <td>Logistic Regression(distance+angle)</td>
+    <td>0.912333</td>
+  </tr>
+</table>
+<br>
+MLP, and all logistic models gave better accuracy than their corresponding validation accuracy,
+it could only mean that dataset used for testing is slightly different than the one used for training the models.
+As we used regular season data for training but used playoff season for testing the models.
+Xgboost has the highest area under the graph for both ROC and Precision-Recall curve and also gave 
+the best accuracy among all classifiers.
+<br>
+
+<center><img src="blogpost/src/assets/images/Q7_best_model_r.png"></center>
+<br>
+<br>
+
